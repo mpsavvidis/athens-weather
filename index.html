@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Καιρός Αθήνας - Minimal Φθινόπωρο</title>
+    
+    <!-- Σύνδεση Φθινοπωρινών Styles -->
+    <link rel="stylesheet" href="style.css">
+
+    <!-- === FAVICON & APP ICONS === -->
+    <link rel="icon" type="image/png" href="icon.png">
+    <link rel="apple-touch-icon" href="icon.png">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#d97706">
+</head>
+<body>
+
+    <div class="weather-card">
+        <!-- Επικεφαλίδα: Ημερομηνία & Ημέρα -->
+        <div class="header-section">
+            <h1 id="current-date">Φόρτωση ημερομηνίας...</h1>
+        </div>
+
+        <!-- Κύριο τμήμα: Θερμοκρασία & Δεξί πλαίσιο (Εικονίδιο & Υγρασία) -->
+        <div class="main-weather">
+            <div class="temp-display">
+                <span id="current-temp">--°</span>
+                <span class="city-label">Αθήνα</span>
+            </div>
+            <div class="weather-badge">
+                <div id="weather-icon" class="weather-icon">⛅</div>
+                <div id="humidity" class="humidity-text">Υγρασία: --%</div>
+            </div>
+        </div>
+
+        <!-- Κατανομή πρόβλεψης θερμοκρασίας έως τις 23:00 -->
+        <div class="forecast-today-section">
+            <h3>Ωριαία Πρόβλεψη (έως 23:00)</h3>
+            <div id="hourly-container" class="hourly-container">
+                <!-- Δυναμική προσθήκη ωριαίων προβλέψεων μέσω JavaScript -->
+            </div>
+        </div>
+
+        <!-- Δυναμική Πρόταση Ντυσίματος για Άντρα & Γυναίκα -->
+        <div class="outfit-section">
+            <h3>Πρόταση Ντυσίματος</h3>
+            <div class="outfit-cards">
+                <div class="outfit-card">
+                    <span class="outfit-gender">👩 Γυναίκα</span>
+                    <p id="woman-outfit">Φόρτωση πρότασης...</p>
+                </div>
+                <div class="outfit-card">
+                    <span class="outfit-gender">👨 Άντρας</span>
+                    <p id="man-outfit">Φόρτωση πρότασης...</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Πρόβλεψη Επόμενης Μέρας -->
+        <div class="tomorrow-section">
+            <h3>Πρόβλεψη Αύριο</h3>
+            <div class="tomorrow-content">
+                <div class="tomorrow-info">
+                    <span id="tomorrow-day" class="tomorrow-day">Αύριο</span>
+                    <span id="tomorrow-temp" class="tomorrow-temp">--°C</span>
+                    <span id="tomorrow-desc" class="tomorrow-desc">--</span>
+                </div>
+                <div id="tomorrow-icon" class="tomorrow-icon">🌤️</div>
+            </div>
+        </div>
+
+        <!-- Υπογραφή Δημιουργού -->
+        <div class="signature">
+            Michail P. Savvidis
+        </div>
+    </div>
+
+    <!-- Σύνδεση JavaScript -->
+    <script src="script.js"></script>
+</body>
+</html>
