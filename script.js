@@ -15,6 +15,14 @@ function getWeatherDetails(code) {
     return { icon: '☁️', desc: 'Συννεφιά' };
 }
 
+// Ασφαλής μετατροπή ISO string σε Date object
+function parseISODate(dateStr) {
+    if (!dateStr) return new Date();
+    // Προσθήκη :00.000 αν λείπει ή αντικατάσταση για συμβατότητα
+    const formatted = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
+    return new Date(formatted);
+}
+
 // Υπολογισμός μέσης θερμοκρασίας για συγκεκριμένο εύρος ωρών
 function getAverageTempForRange(hourlyTimes, hourlyTemps, startHour, endHour) {
     let sum = 0;
@@ -23,7 +31,7 @@ function getAverageTempForRange(hourlyTimes, hourlyTemps, startHour, endHour) {
     const todayDay = now.getDate();
 
     for (let i = 0; i < hourlyTimes.length; i++) {
-        const d = new Date(hourlyTimes[i]);
+        const d = parseISODate(hourlyTimes[i]);
         const hour = d.getHours();
         const day = d.getDate();
 
@@ -37,7 +45,9 @@ function getAverageTempForRange(hourlyTimes, hourlyTemps, startHour, endHour) {
 
 // Παραγωγή πρότασης ενδύματος ανά θερμοκρασία
 function getSpecificOutfit(temp) {
-    if (temp === null) return { woman: "Δεν υπάρχουν δεδομένα", man: "Δεν υπάρχουν δεδομένα" };
+    if (temp === null || isNaN(temp)) {
+        return { woman: "Ελαφρύ τζάκετ ή ζακέτα.", man: "Ζακέτα ή ελαφρύ μπουφάν." };
+    }
 
     if (temp < 10) {
         return {
@@ -66,11 +76,13 @@ async function fetchWeather(cityKey) {
     const refreshBtn = document.getElementById('refresh-btn');
     if (refreshBtn) refreshBtn.classList.add('spinning');
 
-    const city = CITIES[cityKey];
+    const city = CITIES[cityKey] || CITIES.athens;
     const API_URL = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,weather_code&hourly=time,temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto`;
 
     try {
         const response = await fetch(API_URL);
+        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        
         const data = await response.json();
 
         // 1. Ημερομηνία & Ημέρα (Ελληνικά)
@@ -102,7 +114,7 @@ async function fetchWeather(cityKey) {
         limitDate.setHours(5, 0, 0, 0);
 
         for (let i = 0; i < times.length; i++) {
-            const forecastDate = new Date(times[i]);
+            const forecastDate = parseISODate(times[i]);
 
             if (forecastDate >= now && forecastDate <= limitDate) {
                 const forecastHour = forecastDate.getHours();
@@ -167,17 +179,23 @@ async function fetchWeather(cityKey) {
 const citySelect = document.getElementById('city-select');
 const savedCity = localStorage.getItem('selected_city') || 'athens';
 
-citySelect.value = savedCity;
+if (citySelect) {
+    citySelect.value = savedCity;
+    citySelect.addEventListener('change', (e) => {
+        const selected = e.target.value;
+        localStorage.setItem('selected_city', selected);
+        fetchWeather(selected);
+    });
+}
+
+// Εκτέλεση κατά την εκκίνηση
 fetchWeather(savedCity);
 
-citySelect.addEventListener('change', (e) => {
-    const selected = e.target.value;
-    localStorage.setItem('selected_city', selected);
-    fetchWeather(selected);
-});
-
 // Event Listener για το κουμπί Ανανέωσης
-document.getElementById('refresh-btn').addEventListener('click', () => {
-    const selectedCity = citySelect.value;
-    fetchWeather(selectedCity);
-});
+const refreshButton = document.getElementById('refresh-btn');
+if (refreshButton) {
+    refreshButton.addEventListener('click', () => {
+        const selectedCity = citySelect ? citySelect.value : 'athens';
+        fetchWeather(selectedCity);
+    });
+}
