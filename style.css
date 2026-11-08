@@ -1,318 +1,96 @@
-/* Φθινοπωρινή Minimal Παλέτα */
 :root {
-    --bg-color: #fbf8f3;          /* Απαλό κρεμ φόντου */
-    --card-bg: #fffdf9;           /* Καθαρό λευκό/κρεμ κάρτας */
-    --text-primary: #2c221e;      /* Σκούρος καφέ / ξύλινος τόνος κειμένου */
-    --text-secondary: #786452;    /* Απαλός καφέ / terra cotta τόνος */
-    --accent-amber: #d97706;      /* Ζεστό πορτοκαλί / amber φθινοπωρινό */
-    --border-color: #e6dec9;      /* Απαλό περίγραμμα */
-    --badge-bg: #f4ebd0;          /* Απαλό φόντο για πλαίσια */
+    --bg-color: #fbf8f3;
+    --card-bg: #fffdf9;
+    --text-primary: #2c221e;
+    --text-secondary: #786452;
+    --accent-amber: #d97706;
+    --border-color: #e6dec9;
+    --badge-bg: #f4ebd0;
 }
 
-* {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
 
 body {
-    background-color: var(--bg-color);
-    color: var(--text-primary);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    padding: 16px;
+    background-color: var(--bg-color); color: var(--text-primary);
+    display: flex; justify-content: center; align-items: center;
+    min-height: 100vh; padding: 16px;
 }
 
 .weather-card {
-    background-color: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: 20px;
-    width: 100%;
-    max-width: 480px;
-    padding: 24px;
+    background-color: var(--card-bg); border: 1px solid var(--border-color);
+    border-radius: 20px; width: 100%; max-width: 480px; padding: 24px;
     box-shadow: 0 10px 25px rgba(120, 100, 82, 0.08);
 }
 
-/* Επικεφαλίδα & Κουμπί Ανανέωσης */
-.header-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.header-section h1 {
-    font-size: 1.1rem;
-    font-weight: 600;
-    color: var(--text-secondary);
-    text-transform: capitalize;
-    letter-spacing: 0.5px;
-}
+.header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+.header-section h1 { font-size: 1.1rem; font-weight: 600; color: var(--text-secondary); }
 
 .refresh-btn {
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 50%;
-    width: 34px;
-    height: 34px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    cursor: pointer;
-    font-size: 0.9rem;
-    transition: all 0.2s ease;
-    color: var(--text-secondary);
+    background: transparent; border: 1px solid var(--border-color);
+    border-radius: 50%; width: 34px; height: 34px;
+    display: flex; justify-content: center; align-items: center;
+    cursor: pointer; font-size: 0.9rem; color: var(--text-secondary);
 }
+.refresh-btn.spinning { animation: spin 0.8s linear infinite; }
+@keyframes spin { 100% { transform: rotate(360deg); } }
 
-.refresh-btn:hover {
-    background-color: var(--badge-bg);
-    border-color: var(--accent-amber);
-    transform: rotate(45deg);
-}
-
-.refresh-btn.spinning {
-    animation: spin 0.8s linear infinite;
-}
-
-@keyframes spin {
-    100% { transform: rotate(360deg); }
-}
-
-/* Κύρια θερμοκρασία & Δεξί πλαίσιο */
 .main-weather {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: var(--badge-bg);
-    padding: 18px 20px;
-    border-radius: 14px;
-    margin-bottom: 20px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: var(--badge-bg); padding: 18px 20px; border-radius: 14px; margin-bottom: 20px;
 }
 
-.temp-display {
-    display: flex;
-    flex-direction: column;
-}
+.temp-display { display: flex; flex-direction: column; }
+#current-temp { font-size: 3.2rem; font-weight: 700; line-height: 1; }
 
-#current-temp {
-    font-size: 3.2rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    line-height: 1;
-}
-
-/* Styling Dropdown Πόλης */
 .city-select {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--text-primary);
-    background: transparent;
-    border: 1px solid var(--border-color);
-    border-radius: 8px;
-    padding: 4px 8px;
-    margin-top: 6px;
-    cursor: pointer;
-    outline: none;
-}
-
-.city-select:focus {
-    border-color: var(--accent-amber);
+    font-size: 1rem; font-weight: 600; color: var(--text-primary);
+    background: transparent; border: 1px solid var(--border-color);
+    border-radius: 8px; padding: 4px 8px; margin-top: 6px; outline: none;
 }
 
 .weather-badge {
-    text-align: center;
-    background: #ffffff;
-    padding: 10px 14px;
-    border-radius: 10px;
-    border: 1px solid var(--border-color);
-    min-width: 90px;
+    text-align: center; background: #ffffff; padding: 10px 14px;
+    border-radius: 10px; border: 1px solid var(--border-color); min-width: 90px;
 }
+.weather-icon { font-size: 2rem; margin-bottom: 2px; }
+.humidity-text { font-size: 0.75rem; color: var(--text-secondary); font-weight: 500; }
 
-.weather-icon {
-    font-size: 2rem;
-    margin-bottom: 2px;
-}
-
-.humidity-text {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    font-weight: 500;
-}
-
-/* Ωριαία πρόβλεψη */
-.forecast-today-section {
-    margin-bottom: 20px;
-}
-
-.forecast-today-section h3, 
-.outfit-section h3, 
-.tomorrow-section h3 {
-    font-size: 0.85rem;
-    text-transform: uppercase;
-    letter-spacing: 0.8px;
-    color: var(--text-secondary);
-    margin-bottom: 10px;
-}
+.forecast-today-section, .outfit-section, .tomorrow-section { margin-bottom: 20px; }
+h3 { font-size: 0.85rem; text-transform: uppercase; color: var(--text-secondary); margin-bottom: 10px; }
 
 .hourly-container {
-    display: flex;
-    gap: 8px;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    scrollbar-width: thin;
-    scrollbar-color: var(--border-color) transparent;
+    display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px;
+    scrollbar-width: thin; scrollbar-color: var(--border-color) transparent;
 }
-
 .hourly-item {
-    background: #faf6ef;
-    border: 1px solid var(--border-color);
-    border-radius: 10px;
-    padding: 8px 10px;
-    text-align: center;
-    min-width: 58px;
-    flex-shrink: 0;
+    background: #faf6ef; border: 1px solid var(--border-color);
+    border-radius: 10px; padding: 8px 10px; text-align: center; min-width: 58px; flex-shrink: 0;
 }
+.hourly-time { font-size: 0.75rem; color: var(--text-secondary); margin-bottom: 4px; }
+.hourly-icon { font-size: 1.1rem; margin: 2px 0; }
+.hourly-temp { font-size: 0.85rem; font-weight: 600; }
 
-.hourly-time {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    margin-bottom: 4px;
-}
+.outfit-tables-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.outfit-column { background: #faf6ef; border: 1px solid var(--border-color); border-radius: 12px; padding: 10px; }
+.outfit-gender { font-size: 0.85rem; font-weight: 700; color: var(--accent-amber); display: block; margin-bottom: 8px; text-align: center; }
 
-.hourly-icon {
-    font-size: 1.1rem;
-    margin: 2px 0;
-}
-
-.hourly-temp {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: var(--text-primary);
-}
-
-/* Πίνακες Προτάσεων Ενδύματος */
-.outfit-section {
-    margin-bottom: 20px;
-}
-
-.outfit-tables-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 12px;
-}
-
-.outfit-column {
-    background: #faf6ef;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 10px;
-}
-
-.outfit-gender {
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: var(--accent-amber);
-    display: block;
-    margin-bottom: 8px;
-    text-align: center;
-}
-
-.outfit-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 0.75rem;
-}
-
-.outfit-table th {
-    text-align: left;
-    color: var(--text-secondary);
-    border-bottom: 1px solid var(--border-color);
-    padding-bottom: 4px;
-    font-weight: 600;
-}
-
-.outfit-table td {
-    padding: 6px 0;
-    border-bottom: 1px dashed #ede5d3;
-    vertical-align: top;
-}
-
-.outfit-table tr:last-child td {
-    border-bottom: none;
-}
-
-.period-label {
-    font-weight: 600;
-    color: var(--text-primary);
-    width: 45%;
-    padding-right: 4px;
-}
-
-.period-label small {
-    color: var(--text-secondary);
-    font-weight: normal;
-    font-size: 0.65rem;
-}
-
-/* Πρόβλεψη Επόμενης Μέρας */
-.tomorrow-section {
-    margin-bottom: 20px;
-}
+.outfit-table { width: 100%; border-collapse: collapse; font-size: 0.75rem; }
+.outfit-table th { text-align: left; color: var(--text-secondary); border-bottom: 1px solid var(--border-color); padding-bottom: 4px; }
+.outfit-table td { padding: 6px 0; border-bottom: 1px dashed #ede5d3; vertical-align: top; }
+.outfit-table tr:last-child td { border-bottom: none; }
+.period-label { font-weight: 600; width: 45%; padding-right: 4px; }
+.period-label small { color: var(--text-secondary); font-weight: normal; font-size: 0.65rem; }
 
 .tomorrow-content {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    background: #faf6ef;
-    border: 1px solid var(--border-color);
-    border-radius: 12px;
-    padding: 12px 16px;
+    display: flex; justify-content: space-between; align-items: center;
+    background: #faf6ef; border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px;
 }
+.tomorrow-info { display: flex; flex-direction: column; }
+.tomorrow-day { font-size: 0.8rem; font-weight: 600; color: var(--accent-amber); text-transform: uppercase; }
+.tomorrow-temp { font-size: 1.1rem; font-weight: 700; margin: 2px 0; }
+.tomorrow-desc { font-size: 0.75rem; color: var(--text-secondary); }
+.tomorrow-icon { font-size: 2rem; }
 
-.tomorrow-info {
-    display: flex;
-    flex-direction: column;
-}
+.signature { text-align: center; font-size: 0.75rem; color: var(--text-secondary); border-top: 1px dashed var(--border-color); padding-top: 12px; }
 
-.tomorrow-day {
-    font-size: 0.8rem;
-    font-weight: 600;
-    color: var(--accent-amber);
-    text-transform: uppercase;
-}
-
-.tomorrow-temp {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--text-primary);
-    margin: 2px 0;
-}
-
-.tomorrow-desc {
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-}
-
-.tomorrow-icon {
-    font-size: 2rem;
-}
-
-/* Υπογραφή */
-.signature {
-    text-align: center;
-    font-size: 0.75rem;
-    color: var(--text-secondary);
-    letter-spacing: 1px;
-    border-top: 1px dashed var(--border-color);
-    padding-top: 12px;
-    font-weight: 500;
-}
-
-@media (max-width: 380px) {
-    .outfit-tables-grid {
-        grid-template-columns: 1fr;
-    }
-}
+@media (max-width: 380px) { .outfit-tables-grid { grid-template-columns: 1fr; } }

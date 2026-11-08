@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Καιρός - Minimal Φθινόπωρο</title>
     
-    <!-- Σύνδεση Φθινοπωρινών Styles -->
-    <link rel="stylesheet" href="style.css">
+    <!-- Cache busting: Το ?v=2 αναγκάζει το κινητό να φορτώσει το νέο αρχείο -->
+    <link rel="stylesheet" href="style.css?v=2">
 
     <!-- === FAVICON & APP ICONS === -->
     <link rel="icon" type="image/png" href="icon.png">
@@ -17,15 +17,13 @@
 <body>
 
     <div class="weather-card">
-        <!-- Επικεφαλίδα: Ημερομηνία, Ημέρα & Κουμπί Ανανέωσης -->
+        <!-- Επικεφαλίδα -->
         <div class="header-section">
-            <h1 id="current-date">Φόρτωση ημερομηνίας...</h1>
-            <button id="refresh-btn" class="refresh-btn" title="Ανανέωση" aria-label="Ανανέωση δεδομένων καιρού">
-                🔄
-            </button>
+            <h1 id="current-date">Φόρτωση...</h1>
+            <button id="refresh-btn" class="refresh-btn" title="Ανανέωση">🔄</button>
         </div>
 
-        <!-- Κύριο τμήμα: Θερμοκρασία, Dropdown Πόλης & Δεξί πλαίσιο -->
+        <!-- Κύριο τμήμα -->
         <div class="main-weather">
             <div class="temp-display">
                 <span id="current-temp">--°</span>
@@ -40,61 +38,35 @@
             </div>
         </div>
 
-        <!-- Κατανομή πρόβλεψης θερμοκρασίας έως τις 05:00 π.μ. -->
+        <!-- Ωριαία πρόβλεψη -->
         <div class="forecast-today-section">
             <h3>Ωριαία Πρόβλεψη (έως 05:00 π.μ.)</h3>
             <div id="hourly-container" class="hourly-container">
-                <!-- Δυναμική προσθήκη ωριαίων προβλέψεων μέσω JavaScript -->
+                <!-- Δυναμική προσθήκη μέσω JS -->
             </div>
         </div>
 
-        <!-- Δυναμικές Προτάσεις Ντυσίματος: Άντρας (Αριστερά) | Γυναίκα (Δεξιά) -->
+        <!-- Προτάσεις Ντυσίματος -->
         <div class="outfit-section">
             <h3>Πρόταση Ντυσίματος</h3>
             <div class="outfit-tables-grid">
-                <!-- Άντρας Αριστερά -->
                 <div class="outfit-column">
                     <span class="outfit-gender">👨 Άντρας</span>
                     <table class="outfit-table">
-                        <tr>
-                            <th>Περίοδος</th>
-                            <th>Ένδυμα</th>
-                        </tr>
-                        <tr>
-                            <td class="period-label">Πρωί<br><small>07:00 - 10:00</small></td>
-                            <td id="man-morning">--</td>
-                        </tr>
-                        <tr>
-                            <td class="period-label">Μεσημέρι<br><small>12:00 - 15:00</small></td>
-                            <td id="man-noon">--</td>
-                        </tr>
-                        <tr>
-                            <td class="period-label">Βράδυ<br><small>19:30 - 22:30</small></td>
-                            <td id="man-evening">--</td>
-                        </tr>
+                        <tr><th>Περίοδος</th><th>Ένδυμα</th></tr>
+                        <tr><td class="period-label">Πρωί<br><small>07:00-10:00</small></td><td id="man-morning">--</td></tr>
+                        <tr><td class="period-label">Μεσημέρι<br><small>12:00-15:00</small></td><td id="man-noon">--</td></tr>
+                        <tr><td class="period-label">Βράδυ<br><small>19:30-22:30</small></td><td id="man-evening">--</td></tr>
                     </table>
                 </div>
 
-                <!-- Γυναίκα Δεξιά -->
                 <div class="outfit-column">
                     <span class="outfit-gender">👩 Γυναίκα</span>
                     <table class="outfit-table">
-                        <tr>
-                            <th>Περίοδος</th>
-                            <th>Ένδυμα</th>
-                        </tr>
-                        <tr>
-                            <td class="period-label">Πρωί<br><small>07:00 - 10:00</small></td>
-                            <td id="woman-morning">--</td>
-                        </tr>
-                        <tr>
-                            <td class="period-label">Μεσημέρι<br><small>12:00 - 15:00</small></td>
-                            <td id="woman-noon">--</td>
-                        </tr>
-                        <tr>
-                            <td class="period-label">Βράδυ<br><small>19:30 - 22:30</small></td>
-                            <td id="woman-evening">--</td>
-                        </tr>
+                        <tr><th>Περίοδος</th><th>Ένδυμα</th></tr>
+                        <tr><td class="period-label">Πρωί<br><small>07:00-10:00</small></td><td id="woman-morning">--</td></tr>
+                        <tr><td class="period-label">Μεσημέρι<br><small>12:00-15:00</small></td><td id="woman-noon">--</td></tr>
+                        <tr><td class="period-label">Βράδυ<br><small>19:30-22:30</small></td><td id="woman-evening">--</td></tr>
                     </table>
                 </div>
             </div>
@@ -113,13 +85,11 @@
             </div>
         </div>
 
-        <!-- Υπογραφή Δημιουργού -->
-        <div class="signature">
-            Michail P. Savvidis
-        </div>
+        <!-- Υπογραφή -->
+        <div class="signature">Michail P. Savvidis</div>
     </div>
 
-    <!-- Σύνδεση JavaScript -->
-    <script src="script.js"></script>
+    <!-- Cache busting: Το ?v=2 αναγκάζει το κινητό να φορτώσει το νέο αρχείο -->
+    <script src="script.js?v=2"></script>
 </body>
 </html>
