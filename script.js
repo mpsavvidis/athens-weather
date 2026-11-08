@@ -18,13 +18,12 @@ function getWeatherDetails(code) {
 // Ασφαλής μετατροπή ISO string σε Date object
 function parseISODate(dateStr) {
     if (!dateStr) return new Date();
-    // Προσθήκη :00.000 αν λείπει ή αντικατάσταση για συμβατότητα
-    const formatted = dateStr.includes('T') ? dateStr : dateStr.replace(' ', 'T');
-    return new Date(formatted);
+    return new Date(dateStr);
 }
 
 // Υπολογισμός μέσης θερμοκρασίας για συγκεκριμένο εύρος ωρών
 function getAverageTempForRange(hourlyTimes, hourlyTemps, startHour, endHour) {
+    if (!hourlyTimes || !hourlyTemps) return null;
     let sum = 0;
     let count = 0;
     const now = new Date();
@@ -77,11 +76,14 @@ async function fetchWeather(cityKey) {
     if (refreshBtn) refreshBtn.classList.add('spinning');
 
     const city = CITIES[cityKey] || CITIES.athens;
-    const API_URL = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,weather_code&hourly=time,temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=auto`;
+    // Χρήση ρητού timezone Europe/Athens αντί για auto
+    const API_URL = `https://api.open-meteo.com/v1/forecast?latitude=${city.lat}&longitude=${city.lon}&current=temperature_2m,relative_humidity_2m,weather_code&hourly=time,temperature_2m,weather_code&daily=temperature_2m_max,temperature_2m_min,weather_code&timezone=Europe%2FAthens`;
 
     try {
         const response = await fetch(API_URL);
-        if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+        if (!response.ok) {
+            throw new Error(`Σφάλμα δικτύου: ${response.status}`);
+        }
         
         const data = await response.json();
 
@@ -91,79 +93,86 @@ async function fetchWeather(cityKey) {
         document.getElementById('current-date').innerText = now.toLocaleDateString('el-GR', options);
 
         // 2. Τρέχουσα Θερμοκρασία, Εικονίδιο, Υγρασία
-        const currentTemp = Math.round(data.current.temperature_2m);
-        const currentHumidity = data.current.relative_humidity_2m;
-        const currentWeatherCode = data.current.weather_code;
+        if (data.current) {
+            const currentTemp = Math.round(data.current.temperature_2m);
+            const currentHumidity = data.current.relative_humidity_2m;
+            const currentWeatherCode = data.current.weather_code;
 
-        document.getElementById('current-temp').innerText = `${currentTemp}°`;
-        document.getElementById('humidity').innerText = `Υγρασία: ${currentHumidity}%`;
-        
-        const currentDetails = getWeatherDetails(currentWeatherCode);
-        document.getElementById('weather-icon').innerText = currentDetails.icon;
+            document.getElementById('current-temp').innerText = `${currentTemp}°`;
+            document.getElementById('humidity').innerText = `Υγρασία: ${currentHumidity}%`;
+            
+            const currentDetails = getWeatherDetails(currentWeatherCode);
+            document.getElementById('weather-icon').innerText = currentDetails.icon;
+        }
 
         // 3. Ωριαία πρόβλεψη από την τρέχουσα ώρα έως τις 05:00 π.μ. της επόμενης ημέρας
         const hourlyContainer = document.getElementById('hourly-container');
         hourlyContainer.innerHTML = '';
 
-        const times = data.hourly.time;
-        const temps = data.hourly.temperature_2m;
-        const codes = data.hourly.weather_code;
+        if (data.hourly && data.hourly.time) {
+            const times = data.hourly.time;
+            const temps = data.hourly.temperature_2m;
+            const codes = data.hourly.weather_code;
 
-        const limitDate = new Date(now);
-        limitDate.setDate(limitDate.getDate() + 1);
-        limitDate.setHours(5, 0, 0, 0);
+            const limitDate = new Date(now);
+            limitDate.setDate(limitDate.getDate() + 1);
+            limitDate.setHours(5, 0, 0, 0);
 
-        for (let i = 0; i < times.length; i++) {
-            const forecastDate = parseISODate(times[i]);
+            for (let i = 0; i < times.length; i++) {
+                const forecastDate = parseISODate(times[i]);
 
-            if (forecastDate >= now && forecastDate <= limitDate) {
-                const forecastHour = forecastDate.getHours();
-                const details = getWeatherDetails(codes[i]);
-                
-                const item = document.createElement('div');
-                item.className = 'hourly-item';
-                item.innerHTML = `
-                    <div class="hourly-time">${forecastHour < 10 ? '0' + forecastHour : forecastHour}:00</div>
-                    <div class="hourly-icon">${details.icon}</div>
-                    <div class="hourly-temp">${Math.round(temps[i])}°</div>
-                `;
-                hourlyContainer.appendChild(item);
+                if (forecastDate >= now && forecastDate <= limitDate) {
+                    const forecastHour = forecastDate.getHours();
+                    const details = getWeatherDetails(codes[i]);
+                    
+                    const item = document.createElement('div');
+                    item.className = 'hourly-item';
+                    item.innerHTML = `
+                        <div class="hourly-time">${forecastHour < 10 ? '0' + forecastHour : forecastHour}:00</div>
+                        <div class="hourly-icon">${details.icon}</div>
+                        <div class="hourly-temp">${Math.round(temps[i])}°</div>
+                    `;
+                    hourlyContainer.appendChild(item);
+                }
             }
+
+            // 4. Προτάσεις ντυσίματος ανά περίοδο
+            const currTemp = data.current ? Math.round(data.current.temperature_2m) : 18;
+            const morningTemp = getAverageTempForRange(times, temps, 7, 10) ?? currTemp;
+            const noonTemp = getAverageTempForRange(times, temps, 12, 15) ?? currTemp;
+            const eveningTemp = getAverageTempForRange(times, temps, 19, 22) ?? currTemp;
+
+            const morningOutfit = getSpecificOutfit(morningTemp);
+            const noonOutfit = getSpecificOutfit(noonTemp);
+            const eveningOutfit = getSpecificOutfit(eveningTemp);
+
+            // Πίνακας Άντρα (Αριστερά)
+            document.getElementById('man-morning').innerText = morningOutfit.man;
+            document.getElementById('man-noon').innerText = noonOutfit.man;
+            document.getElementById('man-evening').innerText = eveningOutfit.man;
+
+            // Πίνακας Γυναίκας (Δεξιά)
+            document.getElementById('woman-morning').innerText = morningOutfit.woman;
+            document.getElementById('woman-noon').innerText = noonOutfit.woman;
+            document.getElementById('woman-evening').innerText = eveningOutfit.woman;
         }
 
-        // 4. Προτάσεις ντυσίματος ανά περίοδο
-        const morningTemp = getAverageTempForRange(times, temps, 7, 10) ?? currentTemp;
-        const noonTemp = getAverageTempForRange(times, temps, 12, 15) ?? currentTemp;
-        const eveningTemp = getAverageTempForRange(times, temps, 19, 22) ?? currentTemp;
-
-        const morningOutfit = getSpecificOutfit(morningTemp);
-        const noonOutfit = getSpecificOutfit(noonTemp);
-        const eveningOutfit = getSpecificOutfit(eveningTemp);
-
-        // Πίνακας Άντρα (Αριστερά)
-        document.getElementById('man-morning').innerText = morningOutfit.man;
-        document.getElementById('man-noon').innerText = noonOutfit.man;
-        document.getElementById('man-evening').innerText = eveningOutfit.man;
-
-        // Πίνακας Γυναίκας (Δεξιά)
-        document.getElementById('woman-morning').innerText = morningOutfit.woman;
-        document.getElementById('woman-noon').innerText = noonOutfit.woman;
-        document.getElementById('woman-evening').innerText = eveningOutfit.woman;
-
         // 5. Πρόβλεψη Επόμενης Μέρας
-        const tomorrowMax = Math.round(data.daily.temperature_2m_max[1]);
-        const tomorrowMin = Math.round(data.daily.temperature_2m_min[1]);
-        const tomorrowCode = data.daily.weather_code[1];
-        const tomorrowDetails = getWeatherDetails(tomorrowCode);
+        if (data.daily && data.daily.temperature_2m_max) {
+            const tomorrowMax = Math.round(data.daily.temperature_2m_max[1]);
+            const tomorrowMin = Math.round(data.daily.temperature_2m_min[1]);
+            const tomorrowCode = data.daily.weather_code[1];
+            const tomorrowDetails = getWeatherDetails(tomorrowCode);
 
-        const tomorrowDate = new Date();
-        tomorrowDate.setDate(now.getDate() + 1);
-        const tomorrowDayName = tomorrowDate.toLocaleDateString('el-GR', { weekday: 'long' });
+            const tomorrowDate = new Date();
+            tomorrowDate.setDate(now.getDate() + 1);
+            const tomorrowDayName = tomorrowDate.toLocaleDateString('el-GR', { weekday: 'long' });
 
-        document.getElementById('tomorrow-day').innerText = tomorrowDayName;
-        document.getElementById('tomorrow-temp').innerText = `${tomorrowMax}° / ${tomorrowMin}°`;
-        document.getElementById('tomorrow-desc').innerText = tomorrowDetails.desc;
-        document.getElementById('tomorrow-icon').innerText = tomorrowDetails.icon;
+            document.getElementById('tomorrow-day').innerText = tomorrowDayName;
+            document.getElementById('tomorrow-temp').innerText = `${tomorrowMax}° / ${tomorrowMin}°`;
+            document.getElementById('tomorrow-desc').innerText = tomorrowDetails.desc;
+            document.getElementById('tomorrow-icon').innerText = tomorrowDetails.icon;
+        }
 
     } catch (error) {
         console.error('Σφάλμα κατά τη λήψη δεδομένων καιρού:', error);
